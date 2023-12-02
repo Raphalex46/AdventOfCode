@@ -1,6 +1,7 @@
 import Text.Read
 import Data.List
 
+-- Replaces spelled out numbers in the text with actual numbers
 replaceSpelledNums :: String -> String
 replaceSpelledNums [] = []
 replaceSpelledNums l@(x:xs)
@@ -14,11 +15,18 @@ replaceSpelledNums l@(x:xs)
   | "eight" `isPrefixOf` l = next '8'
   | "nine" `isPrefixOf` l = next '9'
   | otherwise = x:replaceSpelledNums xs
+  -- be careful not to remove the entire matched word and only advance
+  -- one character at a time: in a case like "oneight", we want to actually
+  -- consider both the '1' and the '8'
   where next c = c:(l ++ replaceSpelledNums xs)
 
+-- Match and sum the calibration values
 sumCalibrationValues :: (Num a, Read a) => [String] -> a
 sumCalibrationValues input =
+  -- filter for digits
   let filteredInput = [[e | e <- l, e `elem` ['0'..'9']] | l <- input]
+      -- get the first and last digits (or double the single digit if there is
+      -- a single digit
       calNums = [[x, last l] | l@(x:_) <- filteredInput]
       calVals = [case(readMaybe l) of Just e -> e
                                       Nothing ->
