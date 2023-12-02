@@ -1,17 +1,20 @@
 import Text.Read
+import Data.List
 
 replaceSpelledNums :: String -> String
 replaceSpelledNums [] = []
-replaceSpelledNums l@('o':'n':'e':_) = '1':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums l@('t':'w':'o':_) = '2':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums l@('t':'h':'r':'e':'e':_) = '3':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums l@('f':'o':'u':'r':_) = '4':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums l@('f':'i':'v':'e':_) = '5':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums l@('s':'i':'x':_) = '6':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums l@('s':'e':'v':'e':'n':_) = '7':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums l@('e':'i':'g':'h':'t':_) = '8':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums l@('n':'i':'n':'e':_) = '9':(l ++ replaceSpelledNums (drop 1 l))
-replaceSpelledNums (h:xs) = h:replaceSpelledNums xs
+replaceSpelledNums l@(x:xs)
+  | "one" `isPrefixOf` l = next '1'
+  | "two" `isPrefixOf` l = next '2'
+  | "three" `isPrefixOf` l = next '3'
+  | "four" `isPrefixOf` l = next '4'
+  | "five" `isPrefixOf` l = next '5'
+  | "six" `isPrefixOf` l = next '6'
+  | "seven" `isPrefixOf` l = next '7'
+  | "eight" `isPrefixOf` l = next '8'
+  | "nine" `isPrefixOf` l = next '9'
+  | otherwise = x:replaceSpelledNums xs
+  where next c = c:(l ++ replaceSpelledNums xs)
 
 sumCalibrationValues :: (Num a, Read a) => [String] -> a
 sumCalibrationValues input =
