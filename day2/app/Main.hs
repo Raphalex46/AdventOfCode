@@ -1,7 +1,8 @@
-import Data.List.Split
 import Data.Char
+import Data.List.Split
 
 type CubeSet = (Int, Int, Int) -- Corrsponds to red, green, blue
+
 type Game = (Int, [CubeSet]) -- Id and sets
 
 -- Parses a game id
@@ -15,29 +16,28 @@ parseGameId s =
 -- spaces
 parseCubeSet :: String -> CubeSet
 parseCubeSet s =
-  let
-    -- split input at whitespace
-    w = words ([x | x <- s, x /= ','])
-    -- this might be a bit verbose, but the number of cubes is found at even
-    -- indices and the color of the cubes at odd indices
-    nums = [w !! i | i <- [0..(length w - 1)], even i]
-    colors = [w !! i | i <- [1..(length w - 1)], odd i]
-    -- cubes are not sorted by color in the input so we have to check like
-    -- this. This is probably not the best way to write it but it works 
-    assoc = zip nums colors
-    r = case [read v | (v, c) <- assoc, c == "red"] of v:_ -> v; [] -> 0
-    g = case [read v | (v, c) <- assoc, c == "green"] of v:_ -> v; [] -> 0
-    b = case [read v | (v, c) <- assoc, c == "blue"] of v:_ -> v; [] -> 0
-  in (r, g, b)
+  let -- split input at whitespace
+      w = words ([x | x <- s, x /= ','])
+      -- this might be a bit verbose, but the number of cubes is found at even
+      -- indices and the color of the cubes at odd indices
+      nums = [w !! i | i <- [0 .. (length w - 1)], even i]
+      colors = [w !! i | i <- [1 .. (length w - 1)], odd i]
+      -- cubes are not sorted by color in the input so we have to check like
+      -- this. This is probably not the best way to write it but it works
+      assoc = zip nums colors
+      r = case [read v | (v, c) <- assoc, c == "red"] of v : _ -> v; [] -> 0
+      g = case [read v | (v, c) <- assoc, c == "green"] of v : _ -> v; [] -> 0
+      b = case [read v | (v, c) <- assoc, c == "blue"] of v : _ -> v; [] -> 0
+   in (r, g, b)
 
 -- Parse a game (returns the game id and the list of associated cube sets)
 parseGame :: String -> Game
 parseGame s =
   case (splitOn ":" s) of
     [gamePart, setsPart] ->
-        let gameId = parseGameId gamePart
-            sets = map parseCubeSet (splitOn ";" setsPart)
-        in (gameId, sets)
+      let gameId = parseGameId gamePart
+          sets = map parseCubeSet (splitOn ";" setsPart)
+       in (gameId, sets)
     _ -> error "the input should contain 2 parts separated by a single ':'"
 
 -- Checks if a set of cubes is possible given a maximum number of each colored
@@ -50,7 +50,8 @@ setIsPossible (r, g, b) mr mg mb =
 gameIsPossible :: Game -> Int -> Int -> Int -> Bool
 gameIsPossible (_, sets) mr mb mg =
   and (map setIsPossible' sets)
-  where setIsPossible' set = setIsPossible set mr mb mg
+  where
+    setIsPossible' set = setIsPossible set mr mb mg
 
 -- Computes the power of a game
 powerOfMinimumCubes :: Game -> Int
@@ -60,16 +61,14 @@ powerOfMinimumCubes (_, set) =
   let mr = maximum [r | (r, _, _) <- set]
       mg = maximum [g | (_, g, _) <- set]
       mb = maximum [b | (_, _, b) <- set]
-  -- then return the power
-  in mr * mg * mb
+   in -- then return the power
+      mr * mg * mb
 
 main :: IO ()
 main = do
   input <- readFile "input.txt"
-  let
-    games = map parseGame (lines input)
-    possibleGames = [gameId | g@(gameId, _) <- games, gameIsPossible g 12 13 14]
-    powers = map powerOfMinimumCubes games
+  let games = map parseGame (lines input)
+      possibleGames = [gameId | g@(gameId, _) <- games, gameIsPossible g 12 13 14]
+      powers = map powerOfMinimumCubes games
   putStrLn ("Solution to problem 1: " ++ (show (sum possibleGames)))
   putStrLn ("Solution to problem 2: " ++ (show (sum powers)))
-  
